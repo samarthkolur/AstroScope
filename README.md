@@ -1,4 +1,4 @@
-AstroScope
+#AstroScope
 AstroScope is an interactive web application that allows users to explore near-Earth objects and artificial satellites. This project provides a visually engaging experience with satellite data and 3D Earth visualizations, leveraging Three.js to render real-time models.
 
 Features
