@@ -40,7 +40,7 @@ Pioneer 11 – A mission to study Jupiter, Saturn, and the outer solar system (h
 3D Orrery Visualization – Representation of the solar system, showing the relative positions and movements of celestial bodies in 3D space (https://eyes.nasa.gov/apps/asteroids/).
 Near-Earth Object Program (NEO) – A program to detect, track, and characterize Near-Earth asteroids and comets (https://www.nasa.gov/stem-content/near-earth-object-program/#:~:text=Type&text=Near%2DEarth%20Objects%2C%20or%20NEOs,that%20could%20approach%20the%20Earth.).
 NEO Earth Close Approaches – Close approaches of asteroids and comets (https://cneos.jpl.nasa.gov/ca/).
-This project also uses elements from the open-source project Three.js Earth.
+This project also uses elements from the open-source project [Three.js Earth](https://github.com/bobbyroe/threejs-earth).
 
 Contact Us
 For inquiries or support, reach out to us through the following:
