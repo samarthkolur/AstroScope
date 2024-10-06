@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AstroScope</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .navbar {
+      font-family: "Lexend Deca", sans-serif;
+      position: fixed;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(5px); /* Reduced blur effect */
+      -webkit-backdrop-filter: blur(5px); /* Reduced blur effect */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-sizing: border-box;
+    }
+    .navbar h1 {
+      margin: 0;
+      font-size: 1.5em;
+      color: white;
+    }
+    .navbar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+    .navbar li {
+      margin-left: 20px;
+    }
+    .navbar a {
+      position: relative;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+    }
+    .navbar a::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: rgb(23, 168, 236);
+      transform: scaleX(0);
+      transition: transform 0.3s ease-out;
+    }
+    .navbar a:hover::after {
+      transform: scaleX(1);
+    }
+    .navbar a:hover {
+      color: rgb(23, 168, 236);
+      text-decoration-color: rgb(23, 168, 236);
+    }
+    .intro-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: white;
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+      transition-delay: 5s; /* 5 second delay */
+    }
+    .intro-text h1 {
+      font-family: "Lexend Deca", sans-serif;
+      text-transform: uppercase;
+      font-size: 50pt;
+      margin: 0;
+    }
+    .intro-text h2 {
+      font-family: "Lexend Deca", sans-serif;
+      text-transform: uppercase;
+      font-size: 40pt;
+      margin: 0;
+    }
+    .intro-text p {
+      font-family: "Lexend Deca", sans-serif;
+      letter-spacing: 0.5em;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .intro-text button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      font-weight: bold;
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .fade-out {
+      opacity: 0;
+    }
+    .search-container {
+      font-family: "Lexend Deca", sans-serif;
+      position: absolute;
+      top: 20%;
+      left: 20px;
+      width: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: top 0.5s ease-in-out;
+      overflow: visible;
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 1002; /* Increased z-index to ensure it's always on top */
+    }
+    .search-container.top {
+      font-family: "Lexend Deca", sans-serif;
+      top: 60px;
+      margin-top: 10px; 
+      margin-bottom: 10px;/* Adjust this value as needed */
+    }
+    .search-input {
+      font-family: "Lexend Deca", sans-serif;
+      position: relative;
+      width: 100%;
+    }
+    .search-input input {
+      font-family: "Lexend Deca", sans-serif;
+      width: 100%;
+      padding: 10px 40px 10px 10px; /* Increased right padding */
+      border: 2px solid white;
+      border-radius: 10px;
+      outline: none;
+      background: transparent;
+      color: white;
+      box-sizing: border-box;
+    }
+    .search-input input::placeholder {
+      font-family: "Lexend Deca", sans-serif;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .autocom-box {
+      font-family: "Lexend Deca", sans-serif;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 85%;
+      background: rgba(56, 56, 56, 0.878);
+      backdrop-filter: blur(50px);
+      border-radius: 0 0 10px 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000; /* Ensure it's above other elements */
+      margin-top: 5px; /* Add some space between input and suggestion list */
+    }
+    .autocom-box li {
+      font-family: "Lexend Deca", sans-serif;
+      list-style: none;
+      padding: 10px;
+      cursor: pointer;
+      color: white;
+      border-radius: 5px; /* Slightly rounded corners for list items */
+    }
+    .autocom-box li:hover {
+      font-family: "Lexend Deca", sans-serif;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    .icon {
+      font-family: "Lexend Deca", sans-serif;
+      position: absolute;
+      right: 10px; /* Adjusted from 30px to 10px */
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: white;
+    }
+    .icon i {
+      font-size: 20px;
+    }
+    .info-boxes {
+      font-family: "Lexend Deca", sans-serif;
+      position: absolute;
+      top: calc(75px + 80px); /* Adjust based on search box height */
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      display: flex;
+      gap: 20px;
+      z-index: 1001;
+      transition: top 0.5s ease-in-out;
+    }
+    .info-box {
+      font-family: "Lexend Deca", sans-serif;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+      color: white;
+      overflow-y: auto;
+    }
+    .info-box.left-box {
+      flex: 1;
+      min-width: 300px; /* Ensure a minimum width for readability */
+    }
+    .info-box.right-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      flex: 0 1 auto; /* Allow shrinking, but not growing */
+      max-width: 50%; /* Limit maximum width to half the container */
+    }
+    .satellite-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .modal {
+      font-family: "Lexend Deca", sans-serif;
+      display: none;
+      position: fixed;
+      z-index: 10000; /* Increased z-index */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+      backdrop-filter: blur(5px);
+    }
+    .modal-content {
+      font-family: "Lexend Deca", sans-serif;
+      background-color: rgba(255, 255, 255, 0.1);
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      width: 80%;
+      max-width: 600px;
+      position: relative;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      color: white;
+    }
+    .close {
+      color: #fff;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+      color: #bbb;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .info-boxes {
+      display: none;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .left-box, .right-box {
+      width: 48%;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      color: white;
+    }
+    .satellite-image {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js",
+        "jsm/": "https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/",
+        "GLTFLoader": "https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/loaders/GLTFLoader.js"
+      }
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script src="script.js"></script>
+  <script src="suggestions.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="navbar">
+    <h1>AstroScope</h1>
+    <ul>
+      <li><a href="#" onclick="refreshPage()">Home</a></li>
+      <li><a href="#" onclick="openAboutModal()">About</a></li>
+      <li><a href="#" onclick="openContactModal()">Contact</a></li>
+    </ul>
+  </div>
+  <div class="intro-text" id="introText">
+    <b><h1>Explore</h1></b>
+    <h2>Near Earth-Objects</h2>
+    <p>Search for the near earth satellites</p>
+    <button id="exploreButton">Explore Now</button>
+  </div>
+
+  <!-- Search Box with Autocomplete -->
+  <div class="search-container" id="searchBox">
+    <div class="search-input">
+      <input type="text" id="searchInput" placeholder="Search for satellites..." />
+      <div class="icon"><i class="fas fa-search"></i></div>
+    </div>
+    <ul class="autocom-box">
+      <!-- Autocomplete suggestions will be injected here -->
+    </ul>
+  </div>
+
+  <div class="info-boxes" id="infoBoxes" style="display: none;">
+    <div class="info-box left-box"></div>
+    <div class="info-box right-box"></div>
+  </div>
+
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAboutModal()">&times;</span>
+      <h2>About AstroScope</h2>
+      <p>AstroScope is your gateway to exploring the vast world of near-Earth objects and artificial satellites orbiting our planet. From satellites enabling modern communication to near-Earth asteroids and comets, AstroScope brings you the details and discoveries at your fingertips.</p>
+      
+      <h3>Our Mission</h3>
+      <p>At AstroScope, our mission is to make space exploration accessible to everyone. We provide a detailed, interactive experience that allows users to learn about various satellites, their missions, and other celestial objects that play a crucial role in advancing our knowledge of the cosmos.</p>
+      
+      <h3>What You Can Do</h3>
+      <ul>
+        <li><strong>Search and Explore:</strong> Use our intuitive search feature to find information on satellites, including their discovery dates, mission purposes, and other fascinating data.</li>
+        <li><strong>Interactive 3D Visualizations:</strong> Experience our 3D Earth model that showcases satellites orbiting the planet in real-time.</li>
+        <li><strong>Stay Informed:</strong> Keep up-to-date with the latest findings and data on near-Earth objects like asteroids and comets that could impact our planet.</li>
+      </ul>
+      
+      <h3>Our Vision</h3>
+      <p>AstroScope envisions a future where space data and discoveries are easily accessible and understandable for everyone—from curious individuals to space enthusiasts and researchers.</p>
+    </div>
+  </div>
+
+  <div id="contactModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeContactModal()">&times;</span>
+      <h2>Contact Us</h2>
+      <p>We'd love to hear from you! Whether you have questions, feedback, or just want to say hello, feel free to reach out to us.</p>
+      
+      <h3>Get in Touch</h3>
+      <ul>
+        <li><strong>Email:</strong> info@astroscope.com</li>
+        <li><strong>Phone:</strong> +91 1234567890</li>
+        <li><strong>Address:</strong> 4th Street, Chandrappa Layout, Harohalli, Karnataka, India</li>
+      </ul>
+      
+      <h3>Follow Us</h3>
+      <p>Stay connected with AstroScope on social media:</p>
+      <ul>
+        <li>Twitter: @AstroScope</li>
+        <li>Facebook: facebook.com/AstroScope</li>
+        <li>Instagram: @AstroScope_Official</li>
+      </ul>
+      
+      <h3>Feedback</h3>
+      <p>Your feedback helps us improve. If you have suggestions or encountered any issues while using AstroScope, please let us know.</p>
+    </div>
+  </div>
+
+  <script type="module" src="index.js"></script>
+  <!-- Remove these two lines as they're not needed and might cause conflicts -->
+  <!-- <script src="js/suggestions.js"></script> -->
+  <!-- <script src="js/script.js"></script> -->
+
+  <script>
+    // Fade in text after 5 seconds
+    window.onload = function() {
+      const introText = document.getElementById('introText');
+      introText.style.opacity = 1;
+    };
+
+    // Handle explore button click
+    document.getElementById('exploreButton').onclick = function() {
+      document.getElementById('introText').style.display = 'none';
+
+      // Trigger 360 rotation and search box slide-in
+      window.dispatchEvent(new CustomEvent('exploreClicked'));
+    };
+
+    function normalizeString(str) {
+      return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function handleSearch() {
+      const inputValue = normalizeString(searchInput.value.trim());
+      console.log('Searching for:', inputValue);
+
+      const matchedSatellite = satellites.find(sat => 
+        normalizeString(sat['Satellite Name']) === inputValue
+      );
+
+      if (matchedSatellite) {
+        console.log('Match found:', matchedSatellite['Satellite Name']);
+        // Update left info box content
+        leftBox.innerHTML = `
+          <h2>Satellite Data</h2>
+          <p><strong>Name:</strong> ${matchedSatellite['Satellite Name'] || 'N/A'}</p>
+          <p><strong>Discovered:</strong> ${matchedSatellite.Discovered || 'N/A'}</p>
+          <p><strong>Diameter:</strong> ${matchedSatellite.Diameter || 'N/A'}</p>
+          <p><strong>Mass:</strong> ${matchedSatellite.Mass || 'N/A'}</p>
+          <p><strong>Close Approach:</strong> ${matchedSatellite['Close Approach'] || 'N/A'}</p>
+          <p><strong>Impact Risk:</strong> ${matchedSatellite['Impact Risk'] || 'N/A'}</p>
+          <p><strong>Mission:</strong> ${matchedSatellite.Mission || 'N/A'}</p>
+          <p><strong>Facts:</strong> ${matchedSatellite.Facts || 'N/A'}</p>
+          <p><strong>Composition:</strong> ${matchedSatellite.Composition || 'N/A'}</p>
+        `;
+        
+        // Update right info box with only the image
+        const imageName = normalizeString(matchedSatellite['Satellite Name']);
+        rightBox.innerHTML = `
+          <img src="./images/${matchedSatellite['Satellite Name']}.jpg" alt="${matchedSatellite['Satellite Name']}" class="satellite-image" onerror="this.src='./images/default-satellite.jpg';">
+        `;
+        showInfoBoxes();
+      } else {
+        console.log('No match found');
+        resetSearch();
+      }
+    }
+
+    // Update the autocomplete functionality
+    searchInput.addEventListener('input', function() {
+      const query = normalizeString(this.value);
+      autocomBox.innerHTML = '';
+
+      if (query && satellites.length > 0) {
+        const filteredSatellites = satellites.filter(satellite => 
+          normalizeString(satellite['Satellite Name']).includes(query)
+        );
+
+        if (filteredSatellites.length > 0) {
+          autocomBox.style.display = 'block';
+          filteredSatellites.forEach(satellite => {
+            const li = document.createElement('li');
+            li.textContent = satellite['Satellite Name'];
+            li.addEventListener('click', function() {
+              searchInput.value = satellite['Satellite Name'];
+              autocomBox.style.display = 'none';
+              handleSearch();
+            });
+            autocomBox.appendChild(li);
+          });
+        } else {
+          autocomBox.style.display = 'none';
+        }
+      } else {
+        autocomBox.style.display = 'none';
+      }
+    });
+
+    function openAboutModal() {
+      document.getElementById('aboutModal').style.display = 'block';
+    }
+
+    function closeAboutModal() {
+      document.getElementById('aboutModal').style.display = 'none';
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function(event) {
+      if (event.target == document.getElementById('aboutModal')) {
+        closeAboutModal();
+      }
+    }
+
+    function openContactModal() {
+      document.getElementById('contactModal').style.display = 'block';
+    }
+
+    function closeContactModal() {
+      document.getElementById('contactModal').style.display = 'none';
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function(event) {
+      if (event.target == document.getElementById('contactModal')) {
+        closeContactModal();
+      }
+    }
+  </script>
+  <script>
+    function refreshPage() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>
